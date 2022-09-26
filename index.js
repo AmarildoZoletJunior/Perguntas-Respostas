@@ -1,36 +1,73 @@
-const { response } = require("express");
+//iniciando configurações do servidor
 const express = require("express");
 const app = express();
+const bodyParser = require("body-parser");
+//importando conexão e model
+const conectar = require("./dataBase/dataBase");
+const Pergunta = require("./dataBase/Perguntas");
 //importando funçao que pega ip
-const os = require("os");
 let {ip} = require("./configuracaoServer/pegarip");
 let {PORT} = require("./configuracaoServer/pegarip");
+
+
+//Conectando ao banco
+conectar.authenticate().then(()=>{
+    console.log("Conectado ao banco com sucesso")
+}).catch((erro)=>{
+    console.log("Ocorreu um erro:" + erro);
+});
+
+//
 
 //setando que ira usar o ejs como view engine
 app.set('view engine','ejs');
 
+
+//Setando pasta com arquivos estaticos de estilização, como css.
+app.use(express.static("public"));
+
+//passando para json, para ter mais facilidade
+app.use(bodyParser.urlencoded({extended:false}));
+app.use(bodyParser.json());
+
+
+
 //Fazendo renderização de pagina com ejs, precisa utilizar o ./
-app.get("/home/:nome/:lang",(req,res)=>{
-    let exibir = false;
-    let nome = "Amarildo";
-    let lang = "JavaScript";
-    let produtos = [
-        {nome: "doritos",
-        preco: 20
-    },
-    {nome: "coca-cola",
-        preco: 7
-    },
-    {nome: "maçã",
-        preco: 2
-    }
-]
+app.get("/",(req,res)=>{
+    Pergunta.findAll({raw:true, order:[['id','DESC']]}).then((perguntas)=>{
         res.render("./index",{
-            nome: req.params.nome,
-            lang: req.params.lang,
-            msg: exibir,
-            produtos: produtos,
+            perguntas:perguntas
         });
+    })
+});
+
+
+app.post("/perguntaenviada",(req,resp)=>{
+    Pergunta.create({
+        titulo: req.body.titulo,
+        descricao: req.body.descricao
+    }).then(()=>{
+            console.log("Pergunta salva no banco de dados");
+            resp.redirect("/");
+    }).catch((erro)=>{
+        console.log("Algum erro ocorreu: " + erro);
+    });
+})
+
+app.get("/pergunta/:id",(req,resp)=>{
+    let id = req.params.id;
+    Pergunta.findOne(({ where: { id: id }, raw:true })).then((perguntas)=>{
+        console.log(perguntas);
+        resp.render("perguntas/perguntaSolo",{
+            perguntas:perguntas
+        });
+    }).catch((erro)=>{
+        console.log("Ocorreu um erro: " + erro)
+    })
+})
+
+app.get("/perguntas",(req,resp)=>{
+    resp.render("perguntas/perguntas");
 })
 
 

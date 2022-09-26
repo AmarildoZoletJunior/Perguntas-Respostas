@@ -1,29 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Quando estamos utilizando express não precisa especificar a pasta public, pois definimos ela no index.js -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+    <link rel="stylesheet" href="/home.css">
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Guia Perguntas</title>
 </head>
 <body>
-    <h1>Guia perguntas</h1>
-
-   <p> <%= nome %></p> 
-    <br>
-    <p><%= lang %></p>
-
-    <% if(msg === true){ %>
-        <h3>Isso é uma mensagem de erro</h3>
-<%} else{ %>
-    <h3>Sem erros</h3>
-    <%} %>
-
-    <% produtos.forEach(function(produto) { %>
-        <%= produto.nome %>
-        <%= produto.preco %>
+    <%- include ('./components/navbar.ejs') %>
+    <div class="container col-8">
+        <div class="title d-flex flex-row justify-content-between mt-3">
+        <h2 class="text-center">Perguntas e respostas</h2>
+        <button class="btn btn-success btn-sm"><a id="linkPergunta" href="/perguntas">Adicionar pergunta</a></button>
+    </div>
         <hr>
-    <% }) %>
-
+            <% perguntas.forEach(function(user){ %>
+                <div class="card mt-2">
+                <div class="card-header">
+                <h3>   <%=  user.titulo   %>  </h3>
+            </div>
+            <div class="card-body">
+                <a class="botaoPerguntas" href="/pergunta/ <%=  user.id   %> "> <button class="btn btn-primary"> Responder pergunta </button></a>
+            </div>
+        </div>
+            <% }); %>
+    </div>
 </body>
+<%- include ('./components/links.ejs') %>
 </html>
