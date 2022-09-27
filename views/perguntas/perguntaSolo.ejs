@@ -1,30 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+        integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
     <link rel="stylesheet" href="/perguntaSolo.css">
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
+
 <body>
     <%- include ('../components/navbar.ejs') %>
-    <div class="container col-8">
-        <div class="title d-flex flex-row justify-content-between mt-3">
-    </div>
-        <hr>
-                <div class="card mt-2">
-                <div class="card-header">
-                <h3>   <%=  perguntas.titulo   %>  </h3>
+        <div class="container col-8">
+            <br>
+            <div class="card mt-2">
+                <div class="card-header bg-primary">
+                    <h3 class="text-light">
+                        <%= perguntas.titulo %>
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <h5>
+                        <%= perguntas .descricao %>
+                    </h5>
+                </div>
             </div>
-            <div class="card-body">
-                <h3>   <%=  perguntas .descricao   %>  </h3>
+            <br>
+
+            <h6 class="text-center">Respostas:</h6>
+                <% respostas.forEach(function(user){ %>
+                    <div class="card mt-5">
+                        <div class="card-body">
+                    <h6 >   <%=  user.corpo   %>  </h6>
+                </div>
             </div>
+                    <% }); %>
+            <form action="/resposta" method="post">
+                <textarea placeholder="Digite sua resposta" class="form-control mt-3"
+                    name="corpo"></textarea>
+                <input type="hidden" name="perguntaId" value="<%= perguntas.id %>">
+                <button class="btn btn-primary mt-3">Enviar resposta</button>
+            </form>
         </div>
-    </div>
-    
+
 </body>
 <%- include ('../components/links.ejs') %>
+
 </html>

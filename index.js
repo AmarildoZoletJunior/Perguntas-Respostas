@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 //importando conexão e model
 const conectar = require("./dataBase/dataBase");
 const Pergunta = require("./dataBase/Perguntas");
+const Resposta = require("./dataBase/Respostas");
 //importando funçao que pega ip
 let {ip} = require("./configuracaoServer/pegarip");
 let {PORT} = require("./configuracaoServer/pegarip");
@@ -43,6 +44,7 @@ app.get("/",(req,res)=>{
 
 
 app.post("/perguntaenviada",(req,resp)=>{
+    if(req.body.titulo != "" && req.body.descricao != ""){
     Pergunta.create({
         titulo: req.body.titulo,
         descricao: req.body.descricao
@@ -52,6 +54,9 @@ app.post("/perguntaenviada",(req,resp)=>{
     }).catch((erro)=>{
         console.log("Algum erro ocorreu: " + erro);
     });
+}else{
+    resp.redirect("/");
+}
 })
 
 app.get("/pergunta/:id/modificar",async(req,resp)=>{
@@ -84,13 +89,19 @@ app.post("/pergunta/:id",(req,resp)=>{
 })
 })
 
-app.get("/pergunta/:id/solo",(req,resp)=>{
+app.get("/pergunta/solo/:id",(req,resp)=>{
     let id = req.params.id;
     Pergunta.findOne(({ where: { id: id }, raw:true })).then((perguntas)=>{
-        console.log(perguntas);
-        resp.render("perguntas/perguntaSolo",{
-            perguntas:perguntas
+        if(perguntas != undefined){
+        Resposta.findAll(({where: {perguntaId: perguntas.id},raw: true})).then((respostas)=>{
+            resp.render("perguntas/perguntaSolo",{
+                perguntas:perguntas,
+                respostas:respostas,
+            });
         });
+    }else{
+        resp.redirect("/")
+    }
     }).catch((erro)=>{
         console.log("Ocorreu um erro: " + erro)
     })
@@ -98,6 +109,25 @@ app.get("/pergunta/:id/solo",(req,resp)=>{
 
 app.get("/perguntas",(req,resp)=>{
     resp.render("perguntas/perguntaCadastro");
+})
+
+
+app.post("/resposta",(req,resp)=>{
+    let corpo = req.body.corpo
+    let perguntaId = req.body.perguntaId;
+    if(corpo != "" && perguntaId != ""){
+    Resposta.create({
+        corpo: corpo,
+        perguntaId: perguntaId,
+    }).then(()=>{
+        console.log("Resposta registrada com sucesso");
+        resp.redirect(`/pergunta/solo/${perguntaId}`);
+    }).catch((erro)=>{
+        console.log("Ocorreu erro:" + erro);
+    })
+}else{
+    resp.redirect(`/pergunta/solo/${perguntaId}`);
+}
 })
 
 
