@@ -1,4 +1,3 @@
-const { Schema } = require("mongoose");
 const sequelize = require("sequelize");
 const connect = require("./dataBase");
 
@@ -12,7 +11,5 @@ const pergunta = connect.define("pergunta",{
         allowNull: false,
     }
 });
-
-
 module.exports = pergunta;
 

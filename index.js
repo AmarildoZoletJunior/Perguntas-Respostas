@@ -54,7 +54,37 @@ app.post("/perguntaenviada",(req,resp)=>{
     });
 })
 
-app.get("/pergunta/:id",(req,resp)=>{
+app.get("/pergunta/:id/modificar",async(req,resp)=>{
+    let id = req.params.id;
+    Pergunta.findOne(({ where: { id: id }})).then((perguntas)=>{
+        console.log(perguntas.id);
+        resp.render("perguntas/perguntaModificar",{
+            perguntas:perguntas
+        });
+}).catch(()=>{
+    resp.redirect("/");
+})
+})
+
+app.post("/pergunta/:id",(req,resp)=>{
+    let id = req.params.id;
+    Pergunta.findOne(({ where: { id: id }})).then((perguntas)=>{
+        Pergunta.update(
+            {
+                titulo: req.body.titulo,
+                descricao: req.body.descricao,
+            },
+            { where: { id: req.params.id }}
+        ).then(()=>{
+            console.log("Enviado com sucesso");
+            resp.redirect("/");
+        }).catch((erro)=>{
+            console.log("erro:" + erro)
+        })
+})
+})
+
+app.get("/pergunta/:id/solo",(req,resp)=>{
     let id = req.params.id;
     Pergunta.findOne(({ where: { id: id }, raw:true })).then((perguntas)=>{
         console.log(perguntas);
@@ -67,7 +97,7 @@ app.get("/pergunta/:id",(req,resp)=>{
 })
 
 app.get("/perguntas",(req,resp)=>{
-    resp.render("perguntas/perguntas");
+    resp.render("perguntas/perguntaCadastro");
 })
 
 
